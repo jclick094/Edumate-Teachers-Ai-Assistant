@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Educator profile and active subscription details",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "title": { "type": "string" },
+        "institution": { "type": "string" },
+        "department": { "type": "string" },
+        "staffId": { "type": "string" },
+        "bio": { "type": "string" },
+        "blockchainSignerKey": { "type": "string" },
+        "subscriptionTier": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "email"]
+    },
+    "AttendanceRecord": {
+      "title": "AttendanceRecord",
+      "description": "Student attendance session record",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "classId": { "type": "string" },
+        "date": { "type": "string" },
+        "status": { "type": "string" },
+        "note": { "type": "string" },
+        "blockHash": { "type": "string" },
+        "isSealed": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "studentName", "status", "date"]
+    },
+    "GradeEntry": {
+      "title": "GradeEntry",
+      "description": "Student assessment grade and cryptographic seal",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "assessmentTitle": { "type": "string" },
+        "assessmentType": { "type": "string" },
+        "score": { "type": "number" },
+        "maxScore": { "type": "number" },
+        "feedback": { "type": "string" },
+        "blockHash": { "type": "string" },
+        "isVerifiedOnChain": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["studentId", "studentName", "assessmentTitle", "score", "maxScore"]
+    },
+    "LessonNote": {
+      "title": "LessonNote",
+      "description": "AI-generated or teacher curated lesson plan",
+      "type": "object",
+      "properties": {
+        "topic": { "type": "string" },
+        "subject": { "type": "string" },
+        "gradeLevel": { "type": "string" },
+        "curriculum": { "type": "string" },
+        "duration": { "type": "string" },
+        "homeworkAssignment": { "type": "string" },
+        "blockchainHash": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["topic", "subject", "curriculum"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Teacher profile document"
+    },
+    "/users/{userId}/attendance/{attendanceId}": {
+      "schema": { "$ref": "#/entities/AttendanceRecord" },
+      "description": "Teacher's attendance roll call records"
+    },
+    "/users/{userId}/grades/{gradeId}": {
+      "schema": { "$ref": "#/entities/GradeEntry" },
+      "description": "Teacher's gradebook marks"
+    },
+    "/users/{userId}/lesson_notes/{noteId}": {
+      "schema": { "$ref": "#/entities/LessonNote" },
+      "description": "Teacher's lesson notes"
+    }
+  }
+}

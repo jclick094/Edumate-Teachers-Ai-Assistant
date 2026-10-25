@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['userId', 'email'])
+        && data.userId is string
+        && data.email is string
+        && (!('displayName' in data) || data.displayName is string)
+        && (!('title' in data) || data.title is string)
+        && (!('institution' in data) || data.institution is string)
+        && (!('department' in data) || data.department is string)
+        && (!('staffId' in data) || data.staffId is string)
+        && (!('bio' in data) || data.bio is string)
+        && (!('blockchainSignerKey' in data) || data.blockchainSignerKey is string)
+        && (!('subscriptionTier' in data) || data.subscriptionTier is string)
+        && (!('updatedAt' in data) || data.updatedAt is string)
+        && (!('createdAt' in data) || data.createdAt is string);
+    }
+
+    function isValidAttendance(data) {
+      return data.keys().hasAll(['studentId', 'studentName', 'status', 'date'])
+        && data.studentId is string
+        && data.studentName is string
+        && data.status is string
+        && data.date is string
+        && (!('classId' in data) || data.classId is string)
+        && (!('note' in data) || data.note is string)
+        && (!('blockHash' in data) || data.blockHash == null || data.blockHash is string)
+        && (!('isSealed' in data) || data.isSealed is bool);
+    }
+
+    function isValidGrade(data) {
+      return data.keys().hasAll(['studentId', 'studentName', 'assessmentTitle', 'score', 'maxScore'])
+        && data.studentId is string
+        && data.studentName is string
+        && data.assessmentTitle is string
+        && (data.score is int || data.score is float)
+        && (data.maxScore is int || data.maxScore is float)
+        && (!('assessmentType' in data) || data.assessmentType is string)
+        && (!('feedback' in data) || data.feedback is string)
+        && (!('blockHash' in data) || data.blockHash == null || data.blockHash is string)
+        && (!('isVerifiedOnChain' in data) || data.isVerifiedOnChain is bool);
+    }
+
+    function isValidLessonNote(data) {
+      return data.keys().hasAll(['topic', 'subject', 'curriculum'])
+        && data.topic is string
+        && data.subject is string
+        && data.curriculum is string
+        && (!('gradeLevel' in data) || data.gradeLevel is string)
+        && (!('duration' in data) || data.duration is string)
+        && (!('homeworkAssignment' in data) || data.homeworkAssignment is string)
+        && (!('blockchainHash' in data) || data.blockchainHash == null || data.blockchainHash is string);
+    }
+
+    // User Profile
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidUserProfile(request.resource.data);
+      allow delete: if isOwner(userId);
+
+      // Attendance records
+      match /attendance/{attendanceId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidAttendance(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Gradebook entries
+      match /grades/{gradeId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidGrade(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Lesson notes
+      match /lesson_notes/{noteId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidLessonNote(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+    }
+  }
+}

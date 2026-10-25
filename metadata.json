@@ -1,0 +1,6 @@
+{
+  "name": "EduChain AI",
+  "description": "AI & Blockchain Teacher Assistant for lesson notes, attendance roll call, grading, quizzes, exams, script marking, syllabus explorer, and tiered educator subscriptions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
